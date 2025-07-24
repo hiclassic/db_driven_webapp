@@ -1,0 +1,170 @@
+✅ 1️⃣ db.sql ফাইল - লাইন বাই লাইন, শব্দ বাই শব্দ
+### 📌 1. DROP
+sql
+Copy code
+DROP TABLE IF EXISTS product;
+DROP 👉 অর্থ: মুছে ফেলো।
+
+TABLE 👉 কাকে মুছে ফেলবে: টেবিল।
+
+IF EXISTS 👉 যদি আগে থাকে: তখনই মুছে ফেলবে।
+
+product 👉 যে টেবিল মুছে যাবে: product নামের টেবিল।
+
+এটা মানে ➜ যদি product নামে কোনো টেবিল থাকে, তাহলে সেটা ডিলিট করে দাও।
+
+একইভাবে:
+
+sql
+Copy code
+DROP TABLE IF EXISTS manufacturer;
+মুছে দেবে manufacturer টেবিল।
+
+আরও:
+
+sql
+Copy code
+DROP PROCEDURE IF EXISTS insert_manufacturer;
+PROCEDURE 👉 স্টোর্ড প্রোসিজার।
+
+insert_manufacturer 👉 নাম।
+
+sql
+Copy code
+DROP TRIGGER IF EXISTS after_manufacturer_delete;
+TRIGGER 👉 ট্রিগার।
+
+after_manufacturer_delete 👉 ট্রিগারের নাম।
+
+sql
+Copy code
+DROP VIEW IF EXISTS expensive_products;
+VIEW 👉 ভিউ।
+
+expensive_products 👉 ভিউ-এর নাম।
+
+📌 2. CREATE TABLE
+sql
+Copy code
+CREATE TABLE manufacturer (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50),
+  address VARCHAR(100),
+  contact_no VARCHAR(50)
+);
+CREATE TABLE 👉 একটা নতুন টেবিল তৈরি করো।
+
+manufacturer 👉 টেবিলের নাম।
+
+id 👉 ফিল্ড/কলাম নাম: id
+
+INT 👉 টাইপ: পূর্ণসংখ্যা।
+
+AUTO_INCREMENT 👉 আপনা থেকে এক এক করে সংখ্যা বাড়বে।
+
+PRIMARY KEY 👉 এই id হবে ইউনিক চাবি।
+
+name VARCHAR(50) 👉 name নামের কলাম, লেখা থাকবে ৫০ অক্ষর পর্যন্ত।
+
+address VARCHAR(100) 👉 ঠিকানা ১০০ অক্ষর পর্যন্ত।
+
+contact_no VARCHAR(50) 👉 ফোন নাম্বার ৫০ অক্ষর পর্যন্ত।
+
+📌 3. CREATE TABLE product
+sql
+Copy code
+CREATE TABLE product (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50),
+  price INT(5),
+  manufacturer_id INT(10)
+);
+product 👉 প্রোডাক্ট টেবিল।
+
+price INT(5) 👉 দামের জন্য পূর্ণসংখ্যা, ৫ সংখ্যা পর্যন্ত।
+
+manufacturer_id 👉 কোন ম্যানুফ্যাকচারারের সাথে যুক্ত ➜ সেই আইডি।
+
+📌 4. DELIMITER
+sql
+Copy code
+DELIMITER //
+DELIMITER 👉 মাইএসকিউএল কে বলো ➜ প্রোসিজার/ট্রিগার শুরুতে // দিয়ে শেষ হবে।
+
+📌 5. CREATE PROCEDURE
+sql
+Copy code
+CREATE PROCEDURE insert_manufacturer(IN m_name VARCHAR(50), IN m_address VARCHAR(100), IN m_contact VARCHAR(50))
+BEGIN
+  INSERT INTO manufacturer(name, address, contact_no)
+  VALUES (m_name, m_address, m_contact);
+END;
+//
+CREATE PROCEDURE 👉 প্রোসিজার তৈরি করো।
+
+insert_manufacturer 👉 নাম।
+
+IN 👉 ইনপুট।
+
+m_name 👉 ইনপুট ভ্যারিয়েবল।
+
+BEGIN ... END 👉 কাজ শুরু থেকে শেষ।
+
+INSERT INTO manufacturer(...) 👉 manufacturer টেবিলে ঢোকাও।
+
+VALUES (...) 👉 ভ্যালু ইনপুট হবে।
+
+📌 6. CREATE TRIGGER
+sql
+Copy code
+CREATE TRIGGER after_manufacturer_delete
+AFTER DELETE ON manufacturer
+FOR EACH ROW
+BEGIN
+  DELETE FROM product WHERE manufacturer_id = OLD.id;
+END;
+//
+CREATE TRIGGER 👉 ট্রিগার তৈরি করো।
+
+after_manufacturer_delete 👉 ট্রিগারের নাম।
+
+AFTER DELETE ON manufacturer 👉 manufacturer টেবিল থেকে কিছু মুছে গেলে।
+
+FOR EACH ROW 👉 প্রতিটি ডিলিটেড রো-এর জন্য।
+
+DELETE FROM product 👉 প্রোডাক্ট টেবিল থেকে মুছো।
+
+WHERE manufacturer_id = OLD.id 👉 ডিলিট হওয়া ম্যানুফ্যাকচারারের আইডির সাথে মিলে গেলে।
+
+📌 7. CREATE VIEW
+sql
+Copy code
+CREATE VIEW expensive_products AS
+SELECT 
+  p.id AS product_id,
+  p.name AS product_name,
+  p.price,
+  p.manufacturer_id,
+  m.name AS manufacturer_name
+FROM 
+  product p
+JOIN 
+  manufacturer m ON p.manufacturer_id = m.id
+WHERE 
+  p.price > 5000;
+CREATE VIEW 👉 ভিউ তৈরি করো।
+
+expensive_products 👉 ভিউ-এর নাম।
+
+SELECT 👉 কোন কলাম দেখাবে।
+
+p.id AS product_id 👉 প্রোডাক্ট আইডি দেখাও।
+
+p.name AS product_name 👉 প্রোডাক্ট নাম।
+
+JOIN 👉 টেবিল যুক্ত করো।
+
+ON 👉 কিভাবে যুক্ত হবে ➜ manufacturer_id মিলিয়ে।
+
+WHERE p.price > 5000 👉 দাম ৫০০০ এর বেশি।
+

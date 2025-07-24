@@ -7,26 +7,22 @@
 
 ## ✅ Project Highlights
 
-- ✔️ Manufacturer Table — Insert via Stored Procedure
-- ✔️ Product Table — Linked to Manufacturer
-- ✔️ After Delete Trigger — Cascade delete on Product
+- ✔️ `manufacturer` table — Insert via Stored Procedure (`insert_manufacturer`)
+- ✔️ `product` table — Linked with `manufacturer_id` (FK)
+- ✔️ After Delete Trigger — Auto delete related products when a manufacturer is deleted
 - ✔️ View — Expensive Products (Price > 5000)
 - ✔️ Bootstrap 5 UI — Responsive Card, Table, Modal
-- ✔️ SweetAlert2 — Beautiful Success/Error/Confirmation Popups
-- ✔️ Full CRUD — Insert, View, Edit, Delete
+- ✔️ SweetAlert2 — Beautiful Success/Error/Confirmation popups
+- ✔️ Full CRUD — Insert, View, Edit (Modal), Delete (with confirmation)
 
 ---
 
 ## 📁 Folder Structure
 
 db_driven_webapp/
-├── index.php # Insert Form
-├── insert.php # Stored Procedure Insert + SweetAlert
-├── view.php # Bootstrap Table + Edit/Delete Modal + SweetAlert
-├── update.php # Update Logic + SweetAlert
-├── delete.php # Delete Logic + SweetAlert
-├── db.sql # Full SQL Dump (Tables + SP + Trigger + View)
-└── README.md # This File!
+├── index.php # Single entry point (all logic: Insert, View, Edit, Delete)
+├── db.sql # Full SQL Dump (Tables, SP, Trigger, View)
+└── README.md # Project instructions
 
 yaml
 Copy code
@@ -37,7 +33,7 @@ Copy code
 
 ### 1️⃣ Requirements
 
-- **XAMPP/Laragon/Localhost**
+- Localhost (XAMPP, Laragon, etc)
 - PHP 7+ / 8+
 - MySQL / MariaDB
 
@@ -45,31 +41,38 @@ Copy code
 
 ### 2️⃣ Create Database
 
-1. Run Apache + MySQL
-2. Visit [http://localhost/phpmyadmin](http://localhost/phpmyadmin)
-3. Click **Databases** ➜ Create new: `db_driven_webapp` (or any name)
-4. Import `db.sql` file  
-   📌 This creates:  
-   - Tables: `manufacturer`, `product`
-   - Stored Procedure: `insert_manufacturer`
-   - Trigger: `after_manufacturer_delete`
+1. Start Apache + MySQL
+2. Open [http://localhost/phpmyadmin](http://localhost/phpmyadmin)
+3. Click **Databases** ➜ Create database: `db_driven_webapp`
+4. Import `db.sql`  
+   ✅ This will create:  
+   - Tables: `manufacturer`, `product`  
+   - Stored Procedure: `insert_manufacturer`  
+   - Trigger: `after_manufacturer_delete`  
    - View: `expensive_products`
 
 ---
 
-### 3️⃣ Configure DB in PHP Files
+### 3️⃣ Configure DB Credentials
 
-- Open `index.php`, `insert.php`, `view.php`, `update.php`, `delete.php`
-- Ensure:
-  ```php
-  $host = "localhost";
-  $user = "root";
-  $pass = "";
-  $dbname = "db_driven_webapp"; // Your DB name
+Inside `index.php`:
+```php
+$conn = new mysqli("localhost", "root", "YOUR_PASSWORD", "db_driven_webapp");
+Replace "YOUR_PASSWORD" with your MySQL root password.
+(Default for XAMPP is "" — empty)
+
 4️⃣ Run & Test
-✅ Add Manufacturer ➜ via index.php ➜ Stored Procedure used
-✅ Delete Manufacturer ➜ Related Products auto deleted (Trigger)
-✅ View Expensive Products ➜ view.php ➜ Edit/Delete ➜ Modal + SweetAlert2
+✅ Add Manufacturer ➜ Calls Stored Procedure
+
+✅ Add Product ➜ Linked to Manufacturer ID
+
+✅ View Products ➜ Price > 5000 (View)
+
+✅ Edit Product ➜ Bootstrap Modal + SweetAlert2
+
+✅ Delete Product ➜ Confirmation via SweetAlert2
+
+✅ Delete Manufacturer ➜ Related products auto deleted (Trigger)
 
 ✅ Libraries Used
 Bootstrap 5
@@ -84,18 +87,14 @@ html
 Copy code
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 ⚡ Developer Notes
-✔️ Clean Structured PHP (Procedural)
-
-✔️ Use of Stored Procedure — secure insert
-
-✔️ Trigger ensures relational integrity
-
-✔️ View used for filtered product list
-
-✔️ Bootstrap for responsive design
-
-✔️ SweetAlert2 for modern popups
+✔️ Single entry point (index.php)
+✔️ Clean procedural PHP
+✔️ Uses Stored Procedure for secure insert
+✔️ Uses Trigger for relational integrity
+✔️ Uses View for filtered product list
+✔️ Bootstrap for responsive layout
+✔️ SweetAlert2 for modern UX
 
 ❤️ Credits
-Created by @hiclassic
-For DB Driven Web App Module / Assignment / Practice
+Built by @hiclassic
+For DB Driven Web App Module / Assignment / Practice.
