@@ -1,95 +1,81 @@
+-- ✅ 1️⃣ Database তৈরি
+CREATE DATABASE IF NOT EXISTS db_driven_webapp;
+USE db_driven_webapp;
 
--- Drop existing for clean import
-DROP TABLE IF EXISTS product;
-DROP TABLE IF EXISTS manufacturer;
-DROP PROCEDURE IF EXISTS insert_manufacturer;
-DROP TRIGGER IF EXISTS after_manufacturer_delete;
-DROP VIEW IF EXISTS expensive_products;
-
--- Manufacturer Table
-CREATE TABLE manufacturer (
+-- ✅ 2️⃣ Manufacturer টেবিল তৈরি
+CREATE TABLE IF NOT EXISTS Manufacturer (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(50),
+  name VARCHAR(50) NOT NULL,
   address VARCHAR(100),
   contact_no VARCHAR(50)
-);
+) ENGINE=InnoDB;
 
--- Product Table
-CREATE TABLE product (
+-- ✅ 3️⃣ Product টেবিল তৈরি (FK সহ)
+CREATE TABLE IF NOT EXISTS Product (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(50),
-  price INT(5),
-  manufacturer_id INT(10)
-);
+  name VARCHAR(50) NOT NULL,
+  price INT(5) NOT NULL,
+  manufacturer_id INT,
+  FOREIGN KEY (manufacturer_id) REFERENCES Manufacturer(id)
+  ON DELETE CASCADE
+) ENGINE=InnoDB;
 
--- Stored Procedure
-DELIMITER //
-CREATE PROCEDURE insert_manufacturer(IN m_name VARCHAR(50), IN m_address VARCHAR(100), IN m_contact VARCHAR(50))
+-- ✅ 4️⃣ Stored Procedure (Manufacturer Insert করার জন্য)
+DELIMITER $$
+
+CREATE PROCEDURE insert_manufacturer(
+  IN p_name VARCHAR(50),
+  IN p_address VARCHAR(100),
+  IN p_contact_no VARCHAR(50)
+)
 BEGIN
-  INSERT INTO manufacturer(name, address, contact_no)
-  VALUES (m_name, m_address, m_contact);
-END;
-//
+  INSERT INTO Manufacturer (name, address, contact_no)
+  VALUES (p_name, p_address, p_contact_no);
+END$$
+
 DELIMITER ;
 
--- Trigger
-DELIMITER //
+-- ✅ 5️⃣ After DELETE Trigger (Manufacturer delete হলে Product ও delete হবে)
+DELIMITER $$
+
 CREATE TRIGGER after_manufacturer_delete
-AFTER DELETE ON manufacturer
+AFTER DELETE ON Manufacturer
 FOR EACH ROW
 BEGIN
-  DELETE FROM product WHERE manufacturer_id = OLD.id;
-END;
-//
+  DELETE FROM Product WHERE manufacturer_id = OLD.id;
+END$$
+
 DELIMITER ;
 
--- View
-CREATE VIEW expensive_products AS
-SELECT * FROM product WHERE price > 5000;
+-- ✅ 6️⃣ ExpensiveProducts View (Price > 5000)
+CREATE OR REPLACE VIEW ExpensiveProducts AS
+SELECT * FROM Product WHERE price > 5000;
 
-INSERT INTO manufacturer (name, address, contact_no) VALUES
-('Samsung', 'Dhaka, Bangladesh', '01711-111111'),
-('Sony', 'Chittagong, Bangladesh', '01711-222222'),
-('Walton', 'Gazipur, Bangladesh', '01711-333333'),
-('Apple', 'USA HQ', '01711-444444'),
-('Dell', 'Sylhet, Bangladesh', '01711-555555'),
-('HP', 'Rajshahi, Bangladesh', '01711-666666'),
-('Lenovo', 'Khulna, Bangladesh', '01711-777777'),
-('Acer', 'Barishal, Bangladesh', '01711-888888'),
-('Asus', 'Rangpur, Bangladesh', '01711-999999'),
-('Microsoft', 'Mymensingh, Bangladesh', '01711-000000');
+-- Insert 10 Manufacturers
+INSERT INTO Manufacturer (name, address, contact_no) VALUES
+('Samsung', 'Dhaka, Bangladesh', '017xxxxxxxx'),
+('Apple', 'California, USA', '+1-408-xxx-xxxx'),
+('Sony', 'Tokyo, Japan', '+81-3-xxxx-xxxx'),
+('LG', 'Seoul, South Korea', '+82-2-xxx-xxxx'),
+('Huawei', 'Shenzhen, China', '+86-755-xxx-xxxx'),
+('Dell', 'Texas, USA', '+1-512-xxx-xxxx'),
+('HP', 'Palo Alto, USA', '+1-650-xxx-xxxx'),
+('Lenovo', 'Beijing, China', '+86-10-xxx-xxxx'),
+('Asus', 'Taipei, Taiwan', '+886-2-xxx-xxxx'),
+('Acer', 'New Taipei, Taiwan', '+886-2-xxx-xxxx');
 
-
-INSERT INTO product (name, price, manufacturer_id) VALUES
-('Galaxy S23', 85000, 1),
-('Bravia TV', 120000, 2),
-('Walton Fridge', 40000, 3),
-('iPhone 15', 150000, 4),
-('Dell Inspiron', 65000, 5),
-('HP Pavilion', 70000, 6),
-('Lenovo ThinkPad', 80000, 7),
-('Acer Aspire', 55000, 8),
-('Asus ROG Laptop', 130000, 9),
-('Surface Pro', 140000, 10);
-
-
-
-DROP VIEW IF EXISTS expensive_products;
-
-CREATE VIEW expensive_products AS
-SELECT 
-  p.id AS product_id,
-  p.name AS product_name,
-  p.price,
-  p.manufacturer_id,
-  m.name AS manufacturer_name
-FROM 
-  product p
-JOIN 
-  manufacturer m ON p.manufacturer_id = m.id
-WHERE 
-  p.price > 5000;
-
+-- Insert 10 Products
+INSERT INTO Product (name, price, manufacturer_id) VALUES
+('Galaxy S22', 95000, 1),
+('iPhone 14 Pro', 135000, 2),
+('PlayStation 5', 70000, 3),
+('LG OLED TV', 120000, 4),
+('Huawei P50', 75000, 5),
+('Dell XPS 13', 140000, 6),
+('HP Spectre x360', 125000, 7),
+('Lenovo ThinkPad X1', 115000, 8),
+('Asus ROG Phone', 80000, 9),
+('Acer Predator Laptop', 95000, 10);
 
 
 
