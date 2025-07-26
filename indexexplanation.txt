@@ -1,0 +1,221 @@
+🗂️ ১️⃣ PHP Connection & Logic
+php
+Copy code
+<?php
+ob_start(); 
+👉 ob_start():
+এটি Output Buffering শুরু করে।
+এর মানে হলো: পিএইচপি যখন আউটপুট তৈরি করে, তখন তা সরাসরি ব্রাউজারে যাবে না, বরং মেমরিতে জমা হবে ➜ পরে একসাথে পাঠানো যাবে।
+কেন দরকার? ➜ কারণ আমরা header() দিয়ে redirect করতে চাই — আর এটি কাজ করে যদি আগে কোনো আউটপুট না যায়।
+
+php
+Copy code
+$conn = new mysqli("localhost", "root", "2997", "db_driven_webapp");
+👉 new mysqli():
+আমরা MySQL Database এর সাথে কানেক্ট হচ্ছি।
+
+localhost: সার্ভার অ্যাড্রেস (লোকাল)
+
+root: ইউজারনেম
+
+"2997": পাসওয়ার্ড (তোমার পাসওয়ার্ড)
+
+db_driven_webapp: ডাটাবেসের নাম
+
+php
+Copy code
+if ($conn->connect_error) { die("Connection failed: " . $conn->connect_error); }
+👉 যদি ডাটাবেস কানেক্ট না হয় ➜ Error মেসেজ দেখাবে ➜ আর স্ক্রিপ্ট বন্ধ হয়ে যাবে।
+
+✅ Insert Manufacturer
+php
+Copy code
+if (isset($_POST['submit_manufacturer'])) {
+👉 যদি Manufacturer Form সাবমিট হয় ➜ তাহলে নিচের কোড চলবে।
+
+php
+Copy code
+  $name = $_POST['name'];
+  $address = $_POST['address'];
+  $contact_no = $_POST['contact_no'];
+👉 Form Input থেকে Name, Address, Contact No নিচ্ছে।
+
+php
+Copy code
+  $sql = "CALL insert_manufacturer('$name', '$address', '$contact_no')";
+👉 Stored Procedure কল করছে ➜ insert_manufacturer নামে PROCEDURE আছে।
+
+php
+Copy code
+  if ($conn->query($sql) === TRUE) {
+    header("Location: ?added_manufacturer=1");
+    exit;
+  } else { echo "Error: " . $conn->error; }
+👉 যদি ইনসার্ট সফল হয় ➜ পেজ রিফ্রেশ হবে ➜ URL param ?added_manufacturer=1 ➜ SweetAlert দেখাবে।
+
+✅ Insert Product
+php
+Copy code
+if (isset($_POST['submit_product'])) {
+👉 যদি Product Form সাবমিট হয় ➜
+
+php
+Copy code
+  $pname = $_POST['product_name'];
+  $pprice = $_POST['product_price'];
+  $mid = $_POST['manufacturer_id'];
+👉 প্রোডাক্টের নাম, দাম, ম্যানুফ্যাকচারার আইডি নিচ্ছে।
+
+php
+Copy code
+  $sql = "INSERT INTO product (name, price, manufacturer_id) VALUES ('$pname', '$pprice', '$mid')";
+👉 Product Table এ ডিরেক্ট INSERT হচ্ছে।
+
+php
+Copy code
+  if ($conn->query($sql) === TRUE) {
+    header("Location: ?added_product=1");
+    exit;
+  } else { echo "Error: " . $conn->error; }
+👉 Insert সফল হলে ➜ Redirect ➜ SweetAlert।
+
+✅ Update Product
+php
+Copy code
+if (isset($_POST['update'])) {
+👉 Edit Modal থেকে সাবমিট করলে ➜ প্রোডাক্ট আপডেট।
+
+php
+Copy code
+  $id = $_POST['id'];
+  $name = $_POST['name'];
+  $price = $_POST['price'];
+  $sql = "UPDATE product SET name='$name', price='$price' WHERE id='$id'";
+👉 Product এর Name, Price আপডেট ➜ ID দিয়ে।
+
+php
+Copy code
+  if ($conn->query($sql) === TRUE) {
+    header("Location: ?updated_product=1");
+    exit;
+  } else { echo "Error: " . $conn->error; }
+👉 সফল হলে ➜ SweetAlert।
+
+✅ Delete Product
+php
+Copy code
+if (isset($_GET['delete_id'])) {
+  $id = $_GET['delete_id'];
+  $sql = "DELETE FROM product WHERE id='$id'";
+👉 URL param থেকে ID নিয়ে Product Table থেকে ডিলিট।
+
+php
+Copy code
+  if ($conn->query($sql) === TRUE) {
+    header("Location: ?deleted_product=1");
+    exit;
+  } else { echo "Error: " . $conn->error; }
+}
+👉 সফল হলে ➜ SweetAlert।
+
+🗂️ ২️⃣ HTML STRUCTURE
+html
+Copy code
+<nav class="navbar ...">
+👉 Navbar:
+
+Add Manufacturer
+
+Add Product
+
+View Products
+
+View Manufacturers
+সব পেজে লিংক ➜ Routing
+
+🗂️ ৩️⃣ Page Switch
+php
+Copy code
+$page = isset($_GET['page']) ? $_GET['page'] : 'home';
+👉 URL এ ?page=insert ➜ Insert Form দেখাবে। না দিলে Home দেখাবে।
+
+✅ Insert Form
+php
+Copy code
+if ($page == 'insert') {
+  echo '
+    ... Form HTML ...
+  ';
+}
+👉 Manufacturer Add Form
+
+✅ Product Add Form
+php
+Copy code
+elseif ($page == 'add_product') {
+👉 Product Form ➜ Dropdown থেকে Manufacturer Select ➜ SELECT id, name FROM manufacturer
+
+✅ View Products
+php
+Copy code
+elseif ($page == 'view') {
+👉 View Table
+
+Product > 5000
+
+Join ➜ Manufacturer নাম দেখায়
+
+Edit Modal ➜ Inline
+
+Delete ➜ Button
+
+✅ View Manufacturers
+php
+Copy code
+elseif ($page == 'view_manufacturer') {
+👉 Manufacturer Table
+
+✅ Home
+php
+Copy code
+else {
+  echo '<div>...</div>';
+}
+👉 Home ➜ Button ➜ Quick Link
+
+🗂️ ৪️⃣ JavaScript
+js
+Copy code
+function deleteRecord(id) {
+  Swal.fire({
+    ...
+  }).then((result) => {
+    if(result.isConfirmed) {
+      window.location.href='?delete_id='+id+'&page=view';
+    }
+  });
+}
+👉 Delete Button ➜ SweetAlert ➜ Confirm করলে URL param ➜ ডিলিট।
+
+✅ SweetAlert Trigger
+php
+Copy code
+if (isset($_GET['added_manufacturer'])) {
+  echo "<script>Swal.fire({icon:'success',title:'Added!'});</script>";
+}
+👉 যদি URL এ added_manufacturer থাকে ➜ Success Alert!
+
+✅ Output Buffer End
+php
+Copy code
+$conn->close();
+ob_end_flush();
+?>
+👉 Connection বন্ধ ➜ Buffer Flush ➜ আউটপুট একসাথে যায়।
+
+✅ Bootstrap JS
+html
+Copy code
+<script src="...bootstrap.bundle.min.js"></script>
+👉 Modal ঠিকমতো কাজ করার জন্য।
+
