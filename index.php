@@ -123,4 +123,53 @@ if ($page == 'insert') {
       <button type="submit" name="submit_product" class="btn btn-success"><i class="fas fa-plus"></i> Add</button>
     </form>
   </div>';
+  } elseif ($page == 'view') {
+  echo '<div class="card p-4 shadow">';
+  echo '<h2 class="mb-4">Products > 5000</h2>';
+  $sql = "SELECT p.id, p.name, p.price, p.manufacturer_id, m.name AS manufacturer_name FROM product p JOIN manufacturer m ON p.manufacturer_id = m.id WHERE p.price > 5000";
+  $result = $conn->query($sql);
+  if ($result->num_rows > 0) {
+    echo "<div class='table-responsive'>
+      <table class='table table-striped'>
+        <thead class='table-dark'>
+          <tr>
+            <th>ID</th><th>Name</th><th>Price</th><th>Manufacturer</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody>";
+    while ($row = $result->fetch_assoc()) {
+      echo "<tr>
+        <td>".$row['id']."</td>
+        <td>".$row['name']."</td>
+        <td>".$row['price']."</td>
+        <td>".$row['manufacturer_name']."</td>
+        <td>
+          <button class='btn btn-sm btn-primary' data-bs-toggle='modal' data-bs-target='#editModal".$row['id']."'>Edit</button>
+          <button class='btn btn-sm btn-danger' onclick='deleteRecord(".$row['id'].")'>Delete</button>
+        </td>
+      </tr>
+
+      <div class='modal fade' id='editModal".$row['id']."' tabindex='-1'>
+        <div class='modal-dialog'><div class='modal-content'>
+        <form method='POST'>
+          <div class='modal-header'><h5 class='modal-title'>Edit Product</h5>
+          <button type='button' class='btn-close' data-bs-dismiss='modal'></button></div>
+          <div class='modal-body'>
+            <input type='hidden' name='id' value='".$row['id']."'>
+            <div class='mb-3'><label class='form-label'>Name</label>
+            <input type='text' name='name' class='form-control' value='".$row['name']."' required></div>
+            <div class='mb-3'><label class='form-label'>Price</label>
+            <input type='number' name='price' class='form-control' value='".$row['price']."' required></div>
+          </div>
+          <div class='modal-footer'>
+            <button type='submit' name='update' class='btn btn-success'>Update</button>
+            <button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+          </div>
+        </form></div></div></div>";
+    }
+    echo "</tbody></table></div>";
+  } else {
+    echo "<div class='alert alert-warning'>No products found.</div>";
+  }
+  echo '</div>';
 
