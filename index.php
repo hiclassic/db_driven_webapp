@@ -1,69 +1,52 @@
 <?php
-// DB Connection
+ob_start();
 $conn = new mysqli("localhost", "root", "2997", "db_driven_webapp");
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
+if ($conn->connect_error) { die("Connection failed: " . $conn->connect_error); }
 
-
-// Insert Manufacturer
+// ✅ Insert Manufacturer
 if (isset($_POST['submit_manufacturer'])) {
   $name = $_POST['name'];
   $address = $_POST['address'];
   $contact_no = $_POST['contact_no'];
   $sql = "CALL insert_manufacturer('$name', '$address', '$contact_no')";
   if ($conn->query($sql) === TRUE) {
-    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-    <script>Swal.fire({icon:'success',title:'Added!',text:'Manufacturer Added!'}).then(() => { window.location.href='?page=view_manufacturer'; });</script>";
+    header("Location: ?added_manufacturer=1");
     exit;
-  } else {
-    echo "Error: " . $conn->error;
-  }
+  } else { echo "Error: " . $conn->error; }
 }
 
-
-// Insert Product
+// ✅ Insert Product
 if (isset($_POST['submit_product'])) {
   $pname = $_POST['product_name'];
   $pprice = $_POST['product_price'];
   $mid = $_POST['manufacturer_id'];
   $sql = "INSERT INTO product (name, price, manufacturer_id) VALUES ('$pname', '$pprice', '$mid')";
   if ($conn->query($sql) === TRUE) {
-    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-    <script>Swal.fire({icon:'success',title:'Added!',text:'Product Added!'}).then(() => { window.location.href='?page=view'; });</script>";
+    header("Location: ?added_product=1");
     exit;
-  } else {
-    echo "Error: " . $conn->error;
-  }
+  } else { echo "Error: " . $conn->error; }
 }
 
-
-// Update Product
+// ✅ Update Product
 if (isset($_POST['update'])) {
   $id = $_POST['id'];
   $name = $_POST['name'];
   $price = $_POST['price'];
   $sql = "UPDATE product SET name='$name', price='$price' WHERE id='$id'";
   if ($conn->query($sql) === TRUE) {
-    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-    <script>Swal.fire({icon:'success',title:'Updated!',text:'Product Updated!'}).then(() => { window.location.href='?page=view'; });</script>";
+    header("Location: ?updated_product=1");
     exit;
-  } else {
-    echo "Error: " . $conn->error;
-  }
+  } else { echo "Error: " . $conn->error; }
 }
 
-// Delete Product
+// ✅ Delete Product
 if (isset($_GET['delete_id'])) {
   $id = $_GET['delete_id'];
   $sql = "DELETE FROM product WHERE id='$id'";
   if ($conn->query($sql) === TRUE) {
-    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-    <script>Swal.fire({icon:'success',title:'Deleted!',text:'Product Deleted!'}).then(() => { window.location.href='?page=view'; });</script>";
+    header("Location: ?deleted_product=1");
     exit;
-  } else {
-    echo "Error: " . $conn->error;
-  }
+  } else { echo "Error: " . $conn->error; }
 }
 ?>
 
@@ -90,7 +73,9 @@ if (isset($_GET['delete_id'])) {
     </div>
   </div>
 </nav>
+
 <div class="container">
+
 <?php
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 
@@ -123,20 +108,16 @@ if ($page == 'insert') {
       <button type="submit" name="submit_product" class="btn btn-success"><i class="fas fa-plus"></i> Add</button>
     </form>
   </div>';
-  } elseif ($page == 'view') {
+} elseif ($page == 'view') {
   echo '<div class="card p-4 shadow">';
   echo '<h2 class="mb-4">Products > 5000</h2>';
-  $sql = "SELECT p.id, p.name, p.price, p.manufacturer_id, m.name AS manufacturer_name FROM product p JOIN manufacturer m ON p.manufacturer_id = m.id WHERE p.price > 5000";
+  $sql = "SELECT p.id, p.name, p.price, m.name AS manufacturer_name FROM product p JOIN manufacturer m ON p.manufacturer_id = m.id WHERE p.price > 5000";
   $result = $conn->query($sql);
   if ($result->num_rows > 0) {
-    echo "<div class='table-responsive'>
-      <table class='table table-striped'>
-        <thead class='table-dark'>
-          <tr>
-            <th>ID</th><th>Name</th><th>Price</th><th>Manufacturer</th><th>Action</th>
-          </tr>
-        </thead>
-        <tbody>";
+    echo "<table class='table table-striped'>
+      <thead class='table-dark'>
+        <tr><th>ID</th><th>Name</th><th>Price</th><th>Manufacturer</th><th>Action</th></tr>
+      </thead><tbody>";
     while ($row = $result->fetch_assoc()) {
       echo "<tr>
         <td>".$row['id']."</td>
@@ -146,8 +127,7 @@ if ($page == 'insert') {
         <td>
           <button class='btn btn-sm btn-primary' data-bs-toggle='modal' data-bs-target='#editModal".$row['id']."'>Edit</button>
           <button class='btn btn-sm btn-danger' onclick='deleteRecord(".$row['id'].")'>Delete</button>
-        </td>
-      </tr>
+        </td></tr>
 
       <div class='modal fade' id='editModal".$row['id']."' tabindex='-1'>
         <div class='modal-dialog'><div class='modal-content'>
@@ -167,37 +147,22 @@ if ($page == 'insert') {
           </div>
         </form></div></div></div>";
     }
-    echo "</tbody></table></div>";
-  } else {
-    echo "<div class='alert alert-warning'>No products found.</div>";
-  }
+    echo "</tbody></table>";
+  } else { echo "<div class='alert alert-warning'>No products found.</div>"; }
   echo '</div>';
-  } elseif ($page == 'view_manufacturer') {
+} elseif ($page == 'view_manufacturer') {
   echo '<div class="card p-4 shadow">';
   echo '<h2 class="mb-4">Manufacturers</h2>';
   $sql = "SELECT * FROM manufacturer";
   $result = $conn->query($sql);
   if ($result->num_rows > 0) {
-    echo "<div class='table-responsive'>
-      <table class='table table-striped'>
-        <thead class='table-dark'>
-          <tr>
-            <th>ID</th><th>Name</th><th>Address</th><th>Contact</th>
-          </tr>
-        </thead>
-        <tbody>";
+    echo "<table class='table table-striped'>
+      <thead class='table-dark'><tr><th>ID</th><th>Name</th><th>Address</th><th>Contact</th></tr></thead><tbody>";
     while ($row = $result->fetch_assoc()) {
-      echo "<tr>
-        <td>".$row['id']."</td>
-        <td>".$row['name']."</td>
-        <td>".$row['address']."</td>
-        <td>".$row['contact_no']."</td>
-      </tr>";
+      echo "<tr><td>".$row['id']."</td><td>".$row['name']."</td><td>".$row['address']."</td><td>".$row['contact_no']."</td></tr>";
     }
-    echo "</tbody></table></div>";
-  } else {
-    echo "<div class='alert alert-warning'>No manufacturers found.</div>";
-  }
+    echo "</tbody></table>";
+  } else { echo "<div class='alert alert-warning'>No manufacturers found.</div>"; }
   echo '</div>';
 } else {
   echo '<div class="text-center">
@@ -210,24 +175,31 @@ if ($page == 'insert') {
 }
 ?>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function deleteRecord(id) {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'This will delete the product!',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, delete it!'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      window.location.href = '?delete_id=' + id + '&page=view';
-    }
-  });
+  Swal.fire({title:'Are you sure?', text:'Delete this product?', icon:'warning', showCancelButton:true, confirmButtonText:'Yes, delete!'})
+  .then((result) => { if(result.isConfirmed) { window.location.href='?delete_id='+id+'&page=view'; } });
 }
 </script>
+
+<?php
+// SweetAlert Triggers for Redirects
+if (isset($_GET['added_manufacturer'])) {
+  echo "<script>Swal.fire({icon:'success',title:'Added!'});</script>";
+}
+if (isset($_GET['added_product'])) {
+  echo "<script>Swal.fire({icon:'success',title:'Added!'});</script>";
+}
+if (isset($_GET['updated_product'])) {
+  echo "<script>Swal.fire({icon:'success',title:'Updated!'});</script>";
+}
+if (isset($_GET['deleted_product'])) {
+  echo "<script>Swal.fire({icon:'success',title:'Deleted!'});</script>";
+}
+$conn->close();
+ob_end_flush();
+?>
 </body>
 </html>
-<?php $conn->close(); ?>
-
-
