@@ -172,4 +172,43 @@ if ($page == 'insert') {
     echo "<div class='alert alert-warning'>No products found.</div>";
   }
   echo '</div>';
+  } elseif ($page == 'view_manufacturer') {
+  echo '<div class="card p-4 shadow">';
+  echo '<h2 class="mb-4">Manufacturers</h2>';
+  $sql = "SELECT * FROM manufacturer";
+  $result = $conn->query($sql);
+  if ($result->num_rows > 0) {
+    echo "<div class='table-responsive'>
+      <table class='table table-striped'>
+        <thead class='table-dark'>
+          <tr>
+            <th>ID</th><th>Name</th><th>Address</th><th>Contact</th>
+          </tr>
+        </thead>
+        <tbody>";
+    while ($row = $result->fetch_assoc()) {
+      echo "<tr>
+        <td>".$row['id']."</td>
+        <td>".$row['name']."</td>
+        <td>".$row['address']."</td>
+        <td>".$row['contact_no']."</td>
+      </tr>";
+    }
+    echo "</tbody></table></div>";
+  } else {
+    echo "<div class='alert alert-warning'>No manufacturers found.</div>";
+  }
+  echo '</div>';
+} else {
+  echo '<div class="text-center">
+    <h1>Welcome to DB Driven Web App</h1>
+    <a href="?page=insert" class="btn btn-primary"><i class="fas fa-plus"></i> Add Manufacturer</a>
+    <a href="?page=add_product" class="btn btn-success"><i class="fas fa-box"></i> Add Product</a>
+    <a href="?page=view" class="btn btn-info"><i class="fas fa-eye"></i> View Products</a>
+    <a href="?page=view_manufacturer" class="btn btn-secondary"><i class="fas fa-industry"></i> View Manufacturers</a>
+  </div>';
+}
+?>
+</div>
+
 
