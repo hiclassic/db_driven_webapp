@@ -38,3 +38,19 @@ if (isset($_POST['submit_product'])) {
 }
 
 
+// Update Product
+if (isset($_POST['update'])) {
+  $id = $_POST['id'];
+  $name = $_POST['name'];
+  $price = $_POST['price'];
+  $sql = "UPDATE product SET name='$name', price='$price' WHERE id='$id'";
+  if ($conn->query($sql) === TRUE) {
+    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    <script>Swal.fire({icon:'success',title:'Updated!',text:'Product Updated!'}).then(() => { window.location.href='?page=view'; });</script>";
+    exit;
+  } else {
+    echo "Error: " . $conn->error;
+  }
+}
+
+
