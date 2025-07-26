@@ -90,4 +90,37 @@ if (isset($_GET['delete_id'])) {
     </div>
   </div>
 </nav>
+<div class="container">
+<?php
+$page = isset($_GET['page']) ? $_GET['page'] : 'home';
+
+if ($page == 'insert') {
+  echo '
+  <div class="card p-4 shadow">
+    <h2><i class="fas fa-industry"></i> Add Manufacturer</h2>
+    <form method="POST">
+      <div class="mb-3"><label class="form-label">Name</label><input type="text" name="name" class="form-control" required></div>
+      <div class="mb-3"><label class="form-label">Address</label><input type="text" name="address" class="form-control" required></div>
+      <div class="mb-3"><label class="form-label">Contact No</label><input type="text" name="contact_no" class="form-control" required></div>
+      <button type="submit" name="submit_manufacturer" class="btn btn-primary"><i class="fas fa-plus"></i> Add</button>
+    </form>
+  </div>';
+} elseif ($page == 'add_product') {
+  $manus = $conn->query("SELECT id, name FROM manufacturer");
+  echo '
+  <div class="card p-4 shadow">
+    <h2><i class="fas fa-box"></i> Add Product</h2>
+    <form method="POST">
+      <div class="mb-3"><label class="form-label">Product Name</label><input type="text" name="product_name" class="form-control" required></div>
+      <div class="mb-3"><label class="form-label">Price</label><input type="number" name="product_price" class="form-control" required></div>
+      <div class="mb-3"><label class="form-label">Select Manufacturer</label>
+      <select name="manufacturer_id" class="form-select" required>
+        <option value="">-- Select Manufacturer --</option>';
+        while ($row = $manus->fetch_assoc()) {
+          echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
+        }
+  echo '</select></div>
+      <button type="submit" name="submit_product" class="btn btn-success"><i class="fas fa-plus"></i> Add</button>
+    </form>
+  </div>';
 
