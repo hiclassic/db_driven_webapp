@@ -53,4 +53,18 @@ if (isset($_POST['update'])) {
   }
 }
 
+// Delete Product
+if (isset($_GET['delete_id'])) {
+  $id = $_GET['delete_id'];
+  $sql = "DELETE FROM product WHERE id='$id'";
+  if ($conn->query($sql) === TRUE) {
+    echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    <script>Swal.fire({icon:'success',title:'Deleted!',text:'Product Deleted!'}).then(() => { window.location.href='?page=view'; });</script>";
+    exit;
+  } else {
+    echo "Error: " . $conn->error;
+  }
+}
+?>
+
 
