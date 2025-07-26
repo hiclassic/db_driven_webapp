@@ -67,4 +67,27 @@ if (isset($_GET['delete_id'])) {
 }
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DB Driven Web App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  <div class="container">
+    <a class="navbar-brand" href="index.php">DB Driven App</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="?page=insert"><i class="fas fa-plus"></i> Add Manufacturer</a></li>
+        <li class="nav-item"><a class="nav-link" href="?page=add_product"><i class="fas fa-box"></i> Add Product</a></li>
+        <li class="nav-item"><a class="nav-link" href="?page=view"><i class="fas fa-eye"></i> View Products</a></li>
+        <li class="nav-item"><a class="nav-link" href="?page=view_manufacturer"><i class="fas fa-industry"></i> View Manufacturers</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
